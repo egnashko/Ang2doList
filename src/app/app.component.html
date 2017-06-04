@@ -1,3 +1,11 @@
-<h1>
-  {{title}}
-</h1>
+<header>
+    <i class="material-icons fz36 logo_icon">event_available</i>
+    <h1>{{ title }}</h1>
+</header>
+
+<main>
+    <app-todo-form (add)="create($event)"></app-todo-form>
+
+    <app-todo-list [todos]="todos"></app-todo-list>
+</main>
+
