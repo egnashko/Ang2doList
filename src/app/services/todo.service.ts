@@ -1,10 +1,58 @@
 import { Injectable } from '@angular/core';
+import { Http, Headers, RequestOptions } from '@angular/http';
 
-import { todos } from '../shared/data';
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/catch';
+import 'rxjs/add/observable/throw';
+
+import { Todo } from '../shared/todo';
 
 @Injectable()
 export class TodoService {
+  private apiUrl = 'api/todos';
 
-  constructor() { }
+  constructor(private http: Http) {}
+
+  getTodos(): Observable<Todo[]> {
+    return this.http.get(this.apiUrl)
+                    .map(res => res.json().data as Todo[])
+                    .catch(this.handleError);
+  }
+
+  createTodo(title: string) {
+    let headers = new Headers({ 'Content-Type': 'application/json' });
+    let options = new RequestOptions({ headers });
+    let todo = new Todo(title);
+
+    // this.todos.push(todo);
+    return this.http.post(this.apiUrl, todo, options)
+             .map(res => res.json().data)
+             .catch(this.handleError);
+  }
+
+  deleteTodo(todo: Todo) {
+    let headers = new Headers({ 'Content-Type': 'application/json' });
+    let options = new RequestOptions({ headers });
+    let url = `${this.apiUrl}/${todo.id}`;
+
+    return this.http.delete(url, options)
+             .catch(this.handleError);
+
+  }
+
+  toggleTodo(todo: Todo) {
+    let headers = new Headers({ 'Content-Type': 'application/json' });
+    let options = new RequestOptions({ headers });
+    let url = `${this.apiUrl}/${todo.id}`;
+
+    return this.http.put(url, todo, options)
+             .catch(this.handleError);
+  }
+
+  private handleError(error: any) {
+    console.error('Error happened', error);
+    return Observable.throw(error.message || error);
+  }
 
 }
